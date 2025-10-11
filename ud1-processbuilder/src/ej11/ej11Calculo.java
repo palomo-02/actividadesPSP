@@ -1,41 +1,44 @@
 package ej11;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public class ej11Calculo {
-
-	public static String main(String[] args) {
-
-		String linea = null;
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-			while (true) {
-				System.out.print("consola> ");
-				linea = br.readLine();
-				if (linea.isBlank())
-					break;
-				ProcessBuilder pb = new ProcessBuilder("md5sum");
-
-				pb.inheritIO();
-
-				Process p = pb.start();
-
-				try (OutputStream os = p.getOutputStream()) {
-					os.write(linea.getBytes());
-					os.flush();
-				}
-
-				p.waitFor();
-
-			}
-		} catch (
-
-		Exception ex) {
-			ex.printStackTrace();
-		}
-		return linea;
+	
+	public static void main(String [] args) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        
+        while(true) {
+        	try {
+        		System.out.print("md5sum>");
+            	String line = br.readLine();
+            	if(line.isBlank()) break;
+            	
+   
+            	File tmp = File.createTempFile("pipe", ".txt");
+            	Files.writeString(tmp.toPath(), line, StandardCharsets.UTF_8);
+            	
+            	
+            	ProcessBuilder pb = new ProcessBuilder("md5sum");
+            	pb.redirectInput(tmp);
+            	pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
+            	pb.redirectError(ProcessBuilder.Redirect.PIPE);
+            	
+            	Process proceso = pb.start();
+            	proceso.waitFor();
+            	
+            	String salida = new String(proceso.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            	System.out.println(salida);
+            	
+            	tmp.delete();
+        	}catch(Exception ex) {}
+        	
+        }
+        
+        System.out.println("FIN");
 
 	}
 
