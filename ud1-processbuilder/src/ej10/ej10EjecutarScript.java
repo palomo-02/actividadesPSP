@@ -11,18 +11,21 @@ public class ej10EjecutarScript {
 		ProcessBuilder pb = new ProcessBuilder("bash", "-lc", "./hola.sh palomo").directory(new File(
 				"/home/usuario/git_proyectos/actividadesPSPrepaso1/actividadesPSP/ud1-processbuilder/src/ej10"));
 
+		pb.environment().put("prueba", "🍕");
+		
+		
 		try {
 			Process p = pb.start();
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String linea;
-			while ((linea = reader.readLine()) != null) {
-				System.out.println(linea);
+			int codigo = p.waitFor();
+
+			if (codigo == 0) {
+
+				System.out.println("Script ejecutado correctamente. Salida:");
+
+			} else {
+				System.out.println("Error en la ejecucion del script. Salida de error:");
 			}
-
-			int exitCode = p.waitFor();
-			System.out.println("Proceso finalizado con código: " + exitCode);
-
 		} catch (Exception e) {
 			System.err.println("Error al ejecutar el script: " + e.getMessage());
 		}
